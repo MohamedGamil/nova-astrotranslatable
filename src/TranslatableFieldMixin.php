@@ -106,13 +106,20 @@ class TranslatableFieldMixin
             });
 
             $this->fillUsing(function ($request, $model, $attribute, $requestAttribute) use ($locales) {
-                $realAttribute = FieldServiceProvider::normalizeAttribute($this->meta['translatable']['original_attribute'] ?? $attribute);
-                $translations = $request->{$realAttribute};
+                if (class_exists('\Astrotomic\Translatable\TranslatableServiceProvider') && method_exists($model, 'translateOrNew')) {
+                    $realAttribute = FieldServiceProvider::normalizeAttribute($this->meta['translatable']['original_attribute'] ?? $attribute);
+                    $translations = $request->{$realAttribute};
 
-                foreach ($locales as $localeKey => $localeName) {
-                    $translationEntry = $model->translateOrNew($localeKey);
+                    foreach ($locales as $localeKey => $localeName) {
+                        $translationEntry = $model->translateOrNew($localeKey);
 
-                    $translationEntry->{$realAttribute} = $translations[$localeKey] ?? '';
+                        $translationEntry->{$realAttribute} = $translations[$localeKey] ?? '';
+                    }
+                }else{
+                    $realAttribute = FieldServiceProvider::normalizeAttribute($this->meta['translatable']['original_attribute'] ?? $attribute);
+                    $translations = $request->{$realAttribute};
+                    $request->request->add($translations);
+                    parent::fillAttributeFromRequest($request, $requestAttribute, $model, $attribute);
                 }
             });
 
