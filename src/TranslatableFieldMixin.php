@@ -118,6 +118,9 @@ class TranslatableFieldMixin
                 }else{
                     $realAttribute = FieldServiceProvider::normalizeAttribute($this->meta['translatable']['original_attribute'] ?? $attribute);
                     $translations = $request->{$realAttribute};
+                    if (gettype($translations) === "string"){
+                        $translations = json_decode($translations, true);
+                    }
                     $request->request->add($translations);
                     parent::fillAttributeFromRequest($request, $requestAttribute, $model, $attribute);
                 }
