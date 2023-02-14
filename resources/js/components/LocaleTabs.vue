@@ -4,6 +4,7 @@
       <a
         v-for="locale in sortedLocales"
         :key="locale.key"
+        :dusk="errorAttributes[locale.key] + '.locale.tab'"
         class="ml-3 cursor-pointer font-bold text-80 text-sm"
         :class="{
           'text-primary border-b-2 border-primary': locale.key === activeLocale,
